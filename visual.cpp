@@ -41,7 +41,7 @@ void TextWidget::paint(QPainter *painter,
 
     painter->setPen(QPen(color));
     QFont font;
-    font.setPixelSize(frame.height() / 2);
+    font.setPixelSize(frame.height() / 3);
     font.setBold(true);
     painter->setFont(font);
     painter->drawText(frame, Qt::AlignCenter, text);
@@ -106,9 +106,20 @@ void BoardItem::setHelpText()
 
 }
 
+
+void BoardItem::makeAutoMove()
+{
+
+}
+
+bool BoardItem::validateWord(const QString& str)
+{
+
+}
+
 BoardItem::BoardItem(QGraphicsItem* parent_item) :
 	QGraphicsWidget(parent_item), opacity(1), image(tr("atra_dot.png")),
-        rows(5), columns(5), cells(5, QVector<CellItem*> (5))
+        rows(5), columns(10), cells(rows, QVector<CellItem*> (columns))
 {
     setMinimumSize(400, 400);
 
@@ -132,8 +143,8 @@ BoardItem::BoardItem(QGraphicsItem* parent_item) :
         }
     }
 
-    layout->addItem(current_word, 5, 0, 1, 5);
-    layout->addItem(help_test, 6, 0, 1, 5);
+    layout->addItem(current_word, rows, 0, 1, columns);
+    layout->addItem(help_test, rows+1, 0, 1, columns);
 
     setLayout(layout);
 
@@ -205,7 +216,7 @@ void BoardItem::makeMove()
 void BoardItem::setCenterWord(QString str)
 {
     str = str.toUpper();
-    if (str.length() == columns)
+    if (str.length() <= columns)
     {
         for (int i = 0; i < columns; i++)
             (cells[rows / 2][i])->setChar(str[i]);

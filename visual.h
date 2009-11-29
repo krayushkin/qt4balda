@@ -61,12 +61,14 @@ public:
 	~BoardItem();
 	QList<CellItem*> getAjacentsCells(CellItem* cell);
 	QString getCurrentWord();
+        bool validateWord(const QString& str);
 
 	public slots:
 
 	void prepareBeforeMove();
 	void markBeforeSelect();
 	void makeMove();
+        void makeAutoMove();
         void reMove();
         void closeMove();
 	void setCenterWord(QString str);
