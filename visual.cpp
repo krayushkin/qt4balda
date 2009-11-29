@@ -200,7 +200,7 @@ bool BoardItem::eventFilter(QObject *obj, QEvent *event)
     if (cell != 0)
     {
 
-        qDebug() << event->type();
+        //qDebug() << event->type();
 
         switch (event->type())
         {
@@ -220,12 +220,14 @@ bool BoardItem::eventFilter(QObject *obj, QEvent *event)
                     QChar c = key_event->text()[0];
                     if (c.isLetter())
                     {
+                        // Изменяем фазу до вызова cell->setWaitForChar(false), т.к. иначе нам не удасться потерять фокус
+                        log.phase = MoveLog::MOVE_PHASE_ENTER_WORD;
+                        qDebug() << "MOVE_PHASE_ENTER_WORD";
+                        cell->setMarkedFont(true);
                         cell->setChar(c);
                         cell->setWaitForChar(false);
                         markBeforeSelect();
                         log.added_char = cell;
-                        log.phase = MoveLog::MOVE_PHASE_ENTER_WORD;
-                        qDebug() << "MOVE_PHASE_ENTER_WORD";
                     }
                 }
                 break;
@@ -277,6 +279,7 @@ bool BoardItem::eventFilter(QObject *obj, QEvent *event)
                     if (log.cells.isEmpty() || allowed)
                     {
                         cell->setState(STATE_SELECTED);
+                        cell->setFocus(false);
                         log.cells.append(cell);
                         emit currentWordChanged( getCurrentWord() );
                     }

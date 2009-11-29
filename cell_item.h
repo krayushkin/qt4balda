@@ -39,6 +39,7 @@ public:
 		void delChar();
 
 		void setFocus(bool focus = true);
+                void setMarkedFont(bool value = true);
 		void setState(State s);
 
 		void setWaitForChar(bool x = true);
@@ -58,7 +59,8 @@ private:
 
 	bool	is_empty,
 			is_focused,
-			is_wait_char;
+                        is_wait_char,
+                        is_font_marked;
 
 	State state;
 
@@ -70,7 +72,9 @@ private:
 			background_color_selected,
 			border_color_focused,
 			border_color_unfocused,
-			border_color_wait_char;
+                        border_color_wait_char,
+                        font_color_marked,
+                        font_color_unmarked;
 
 
 	qreal opacity;

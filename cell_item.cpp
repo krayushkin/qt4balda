@@ -25,15 +25,18 @@ CellItem::CellItem(QGraphicsItem* parent_item, int row, int column) :
 			is_empty(true),
 			is_focused(false),
 			is_wait_char(false),
+                        is_font_marked(false),
 			state(STATE_DEFAULT),
 			row(row),
 			column(column),
 			background_color_default("white"),
 			background_color_not_allowed("red"),
-			background_color_selected("pink"),
-			border_color_focused("blue"),
+                        background_color_selected("khaki"),
+                        border_color_focused("blueviolet"),
 			border_color_unfocused("black"),
-			border_color_wait_char("orange")
+                        border_color_wait_char("deeppink"),
+                        font_color_marked("black"),
+                        font_color_unmarked("black")
 
 	{
 	setAcceptHoverEvents(true);
@@ -42,6 +45,11 @@ CellItem::CellItem(QGraphicsItem* parent_item, int row, int column) :
 	policy.setHeightForWidth(true);
 	setSizePolicy(policy);
 	updateGeometry();
+}
+
+void CellItem::setMarkedFont(bool value)
+{
+    is_font_marked = value;
 }
 
 bool CellItem::isAdjacentWith(CellItem* other)
@@ -68,7 +76,7 @@ QSizeF CellItem::sizeHint(Qt::SizeHint which,
 	case Qt::MinimumSize:
 	case Qt::PreferredSize:
 		// Do not allow a size smaller than the pixmap with two frames around it.
-		return QSizeF(10, 10);
+                return QSizeF(60, 60);
 	case Qt::MaximumSize:
 		return QSizeF(1000, 1000);
 	default:
@@ -89,7 +97,7 @@ void CellItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 	QRectF frame(QPointF(0, 0), geometry().size());
 	qreal rounded_pix = (frame.width() + frame.height()) / 30;
-
+        qreal background_opacity = 1;
 
 
 switch (state) {
@@ -98,7 +106,8 @@ switch (state) {
 		break;
 
 	case STATE_NOT_ALLOWED:
-		painter->setBrush(QBrush(background_color_not_allowed, Qt::SolidPattern));
+                painter->setBrush(QBrush(background_color_not_allowed, Qt::SolidPattern));
+                background_opacity = 0.5;
 		break;
 
 	case STATE_SELECTED:
@@ -109,18 +118,34 @@ switch (state) {
 		break;
 }
 
-	if (is_wait_char) painter->setPen( border_color_wait_char );
+        QPen pen;
+        pen.setWidth(1);
+        if (is_wait_char) pen.setColor(border_color_wait_char );
 	else
-		if (is_focused) painter->setPen( border_color_focused );
-			else painter->setPen( border_color_unfocused );
-	painter->drawRoundedRect(frame, rounded_pix, rounded_pix);
+        {
+                if (is_focused) pen.setColor( border_color_focused );
+                        else pen.setColor( border_color_unfocused );
+        }
+        painter->setPen( pen );
+
+        painter->setOpacity(background_opacity);
+
+        painter->drawRoundedRect(frame, rounded_pix, rounded_pix);
+        painter->setOpacity(1);
 
 	if (!is_empty)
 	{
-		painter->setPen( QColor("black") );
 		QFont font;
 		font.setPixelSize(frame.height() / 2);
-		font.setBold(true);
+                font.setBold(true);
+
+                if (is_font_marked)
+                {
+                    font.setItalic(true);
+                    painter->setPen(font_color_marked);
+                }
+                else painter->setPen(font_color_unmarked);
+
 		painter->setFont(font);
 		painter->drawText(frame, c, QTextOption(Qt::AlignCenter));
 	}
