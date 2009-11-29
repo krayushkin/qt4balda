@@ -67,12 +67,16 @@ public:
 	void prepareBeforeMove();
 	void markBeforeSelect();
 	void makeMove();
+        void reMove();
+        void closeMove();
 	void setCenterWord(QString str);
 
+        void setHelpText();
 
 	signals:
 	void moveComplete();
 	void currentWordChanged(const QString& str);
+        void stateChanged();
 
 private:
 	bool eventFilter(QObject *obj, QEvent *event);
@@ -82,7 +86,7 @@ private:
 	// Visual settings
 	qreal opacity;
 	QPixmap image;
-
+        TextWidget* help_test;
 	int rows, columns;
 
 	// Cells
@@ -91,23 +95,6 @@ private:
 	MoveLog log;
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #endif /* VISUAL_H_ */

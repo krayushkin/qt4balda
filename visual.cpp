@@ -78,6 +78,34 @@ QList<CellItem*> BoardItem::getAjacentsCells(CellItem* cell)
     return list;
 }
 
+void BoardItem::setHelpText()
+{
+    switch (log.phase)
+    {
+    case MoveLog::MOVE_PHASE_NOT_STARTED:
+        help_test->setText(tr("Move not started"));
+
+        break;
+
+    case MoveLog::MOVE_PHASE_STARTED:
+        help_test->setText(tr("Click on cell and enter char"));
+        break;
+
+    case MoveLog::MOVE_PHASE_WAIT_FOR_CHAR:
+        help_test->setText(tr("Enter letter by pressing a key"));
+        break;
+
+    case MoveLog::MOVE_PHASE_ENTER_WORD:
+        help_test->setText(tr("Enter word by selecting letters"));
+        break;
+
+    case MoveLog::MOVE_PHASE_CLOSE_WORD:
+        break;
+    }
+
+
+}
+
 BoardItem::BoardItem(QGraphicsItem* parent_item) :
 	QGraphicsWidget(parent_item), opacity(1), image(tr("atra_dot.png")),
         rows(5), columns(5), cells(5, QVector<CellItem*> (5))
@@ -87,8 +115,12 @@ BoardItem::BoardItem(QGraphicsItem* parent_item) :
     QGraphicsGridLayout *layout = new QGraphicsGridLayout;
 
     TextWidget* current_word = new TextWidget("", this);
+    help_test = new TextWidget("", this);
     connect(current_word, SIGNAL(clicked()), this, SLOT(makeMove()));
     connect(this, SIGNAL(currentWordChanged(const QString &)), current_word, SLOT(setText(const QString &)));
+    connect(this, SIGNAL(moveComplete()), this, SLOT(closeMove()));
+    connect(this, SIGNAL(stateChanged()), this, SLOT( setHelpText()));
+
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < columns; j++)
@@ -99,12 +131,16 @@ BoardItem::BoardItem(QGraphicsItem* parent_item) :
             layout->addItem(it, i, j);
         }
     }
+
     layout->addItem(current_word, 5, 0, 1, 5);
+    layout->addItem(help_test, 6, 0, 1, 5);
+
     setLayout(layout);
 
     log.phase = MoveLog::MOVE_PHASE_NOT_STARTED;
+    emit stateChanged();
 
-    setCenterWord(tr("BALDA"));
+    setCenterWord(tr("balda"));
 
     qDebug() << "MOVE_PHASE_NOT_STARTED";
 }
@@ -157,6 +193,7 @@ void BoardItem::makeMove()
     if (log.phase == MoveLog::MOVE_PHASE_NOT_STARTED)
     {
         log.phase = MoveLog::MOVE_PHASE_STARTED;
+        emit stateChanged();
         qDebug() << "MOVE_PHASE_STARTED";
         prepareBeforeMove();
 
@@ -193,6 +230,37 @@ QString BoardItem::getCurrentWord()
     return str;
 }
 
+void BoardItem::reMove()
+{
+    if (log.phase == MoveLog::MOVE_PHASE_CLOSE_WORD)
+    {
+        log.added_char->delChar();
+        closeMove();
+        makeMove();
+    }
+}
+
+void BoardItem::closeMove()
+{
+    if (log.phase == MoveLog::MOVE_PHASE_CLOSE_WORD)
+    {
+        log.added_char->setMarkedFont(false);
+        log.cells.clear();
+        foreach (QVector<CellItem*> row, cells)
+        {
+            foreach (CellItem* item, row)
+            {
+                item->setState(STATE_DEFAULT);
+            }
+        }
+        emit currentWordChanged(getCurrentWord());
+        log.phase = MoveLog::MOVE_PHASE_NOT_STARTED;
+        emit stateChanged();
+        qDebug() << "MOVE_PHASE_NOT_STARTED";
+
+    }
+}
+
 bool BoardItem::eventFilter(QObject *obj, QEvent *event)
 {
     CellItem * cell = dynamic_cast<CellItem *> (obj);
@@ -222,6 +290,7 @@ bool BoardItem::eventFilter(QObject *obj, QEvent *event)
                     {
                         // Изменяем фазу до вызова cell->setWaitForChar(false), т.к. иначе нам не удасться потерять фокус
                         log.phase = MoveLog::MOVE_PHASE_ENTER_WORD;
+                        emit stateChanged();
                         qDebug() << "MOVE_PHASE_ENTER_WORD";
                         cell->setMarkedFont(true);
                         cell->setChar(c);
@@ -237,7 +306,9 @@ bool BoardItem::eventFilter(QObject *obj, QEvent *event)
             if (log.phase == MoveLog::MOVE_PHASE_ENTER_WORD)
             {
                 log.phase = MoveLog::MOVE_PHASE_CLOSE_WORD;
+                emit stateChanged();
                 qDebug() << "MOVE_PHASE_CLOSE_WORD";
+                emit moveComplete();
             }
 
             break;
@@ -250,6 +321,7 @@ bool BoardItem::eventFilter(QObject *obj, QEvent *event)
                 {
                     cell->setWaitForChar(true);
                     log.phase = MoveLog::MOVE_PHASE_WAIT_FOR_CHAR;
+                    emit stateChanged();
                     qDebug() << "MOVE_PHASE_WAIT_FOR_CHAR";
                     foreach (QVector<CellItem*> row, cells)
                     {
