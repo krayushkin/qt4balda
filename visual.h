@@ -25,8 +25,13 @@ struct MoveLog
 		MOVE_PHASE_CLOSE_WORD
 	};
 
+        // Current phase
 	MovePhase phase;
+
+        // The list of items in the order they are added
 	QList<CellItem*> cells;
+
+        // Added char
 	CellItem* added_char;
 };
 
@@ -36,7 +41,7 @@ class TextWidget : public QGraphicsWidget
 public:
 	TextWidget(const QString& text, QGraphicsItem* parent);
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,	QWidget *widget);
-	void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+        void mousePressEvent (QGraphicsSceneMouseEvent * event );
 
 	public slots:
 	void addChar(QChar c);
@@ -49,6 +54,7 @@ private:
 	QString text;
 	QColor color;
 };
+
 
 
 
@@ -76,7 +82,7 @@ public:
         void setHelpText();
 
 	signals:
-	void moveComplete();
+        void tryComplete();
 	void currentWordChanged(const QString& str);
         void stateChanged();
 

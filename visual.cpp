@@ -119,9 +119,9 @@ bool BoardItem::validateWord(const QString& str)
 
 BoardItem::BoardItem(QGraphicsItem* parent_item) :
 	QGraphicsWidget(parent_item), opacity(1), image(tr("atra_dot.png")),
-        rows(5), columns(10), cells(rows, QVector<CellItem*> (columns))
+        rows(5), columns(5), cells(rows, QVector<CellItem*> (columns))
 {
-    setMinimumSize(400, 400);
+    setMinimumSize(100, 100);
 
     QGraphicsGridLayout *layout = new QGraphicsGridLayout;
 
@@ -129,7 +129,6 @@ BoardItem::BoardItem(QGraphicsItem* parent_item) :
     help_test = new TextWidget("", this);
     connect(current_word, SIGNAL(clicked()), this, SLOT(makeMove()));
     connect(this, SIGNAL(currentWordChanged(const QString &)), current_word, SLOT(setText(const QString &)));
-    connect(this, SIGNAL(moveComplete()), this, SLOT(closeMove()));
     connect(this, SIGNAL(stateChanged()), this, SLOT( setHelpText()));
 
     for (int i = 0; i < rows; i++)
@@ -249,6 +248,10 @@ void BoardItem::reMove()
         closeMove();
         makeMove();
     }
+    else
+    {
+        qDebug() << "Cannot reMove because state is not MoveLog::MOVE_PHASE_CLOSE_WORD";
+    }
 }
 
 void BoardItem::closeMove()
@@ -319,7 +322,18 @@ bool BoardItem::eventFilter(QObject *obj, QEvent *event)
                 log.phase = MoveLog::MOVE_PHASE_CLOSE_WORD;
                 emit stateChanged();
                 qDebug() << "MOVE_PHASE_CLOSE_WORD";
-                emit moveComplete();
+                if (log.cells.contains(log.added_char)){
+                    qDebug() << "Contain";
+                    closeMove();
+                }
+
+                else{
+                    qDebug() << "Not contain";
+                    reMove();
+                }
+
+
+
             }
 
             break;

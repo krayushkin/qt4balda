@@ -8,7 +8,7 @@ game::game(QWidget *parent) :
 
     scene = new QGraphicsScene;
 
-    board_window = new QGraphicsWidget(NULL, Qt::Window);
+    board_window = new QGraphicsWidget(NULL, Qt::Widget);
     game_board = new BoardItem(board_window);
 
 

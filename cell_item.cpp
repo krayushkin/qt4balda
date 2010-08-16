@@ -30,13 +30,14 @@ CellItem::CellItem(QGraphicsItem* parent_item, int row, int column) :
 			row(row),
 			column(column),
 			background_color_default("white"),
-			background_color_not_allowed("red"),
+                        background_color_not_allowed("green"),
                         background_color_selected("khaki"),
                         border_color_focused("blueviolet"),
 			border_color_unfocused("black"),
                         border_color_wait_char("deeppink"),
                         font_color_marked("black"),
-                        font_color_unmarked("black")
+                        font_color_unmarked("black"),
+                        angle(rand() % 4 - 2)
 
 	{
 	setAcceptHoverEvents(true);
@@ -76,7 +77,7 @@ QSizeF CellItem::sizeHint(Qt::SizeHint which,
 	case Qt::MinimumSize:
 	case Qt::PreferredSize:
 		// Do not allow a size smaller than the pixmap with two frames around it.
-                return QSizeF(60, 60);
+                return QSizeF(30, 30);
 	case Qt::MaximumSize:
 		return QSizeF(1000, 1000);
 	default:
@@ -130,7 +131,11 @@ switch (state) {
 
         painter->setOpacity(background_opacity);
 
+        painter->save();
+        painter->rotate(angle);
         painter->drawRoundedRect(frame, rounded_pix, rounded_pix);
+        painter->restore();
+
         painter->setOpacity(1);
 
 	if (!is_empty)

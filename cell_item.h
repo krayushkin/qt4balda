@@ -78,6 +78,7 @@ private:
 
 
 	qreal opacity;
+        qreal angle;
 	QChar c;
 };
 
