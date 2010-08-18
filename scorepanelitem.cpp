@@ -1,11 +1,19 @@
 #include "scorepanelitem.h"
 #include <QGraphicsLinearLayout>
 #include <QPainter>
+#include <QGraphicsProxyWidget>
+#include <QLabel>
+#include <QGraphicsTextItem>
+#include <QPropertyAnimation>
 
 ScorePanelItem::ScorePanelItem(QString player_name, QImage icon, QGraphicsWidget *parent) :
     QGraphicsWidget(parent)
 {
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
 
+
+
+    setLayout(layout);
 }
 
 void ScorePanelItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -13,7 +21,7 @@ void ScorePanelItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     QRectF frame(QPointF(0, 0), geometry().size());
     painter->setOpacity(0.7);
-    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+
 
 }
 
@@ -43,10 +51,22 @@ void ScorePanelItem::Clear()
     update();
 }
 
-void ScorePanelItem::AddWord(QString word)
+void ScorePanelItem::AddWord(QList<CellItem*> word)
 {
-    m_words.append(word);
-    update();
+    QParallelAnimationGroup *anim_group = new QParallelAnimationGroup(this);
+    foreach(CellItem* item, word)
+    {
+        QGraphicsPixmapItem* p_item = new QGraphicsPixmapItem(item->snapshot() ,this);
+        p_item->setPos(item->scenePos());
+        QPropertyAnimation *anim = new QPropertyAnimation;
+        anim->setPropertyName("pos");
+        anim->setTargetObject((QObject*)p_item);
+        anim->setDuration(1000);
+        anim->setStartValue(item->scenePos());
+        anim->setEndValue(QPointF(0, 0));
+        anim_group->addAnimation(anim);
+    }
+    anim_group->start();
 }
 
 

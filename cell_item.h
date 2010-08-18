@@ -25,7 +25,7 @@ public:
 
 	CellItem(QGraphicsItem* parent_item, int row, int column);
 	~CellItem();
-
+        QPixmap snapshot();
 	QPoint getPosition();
 	bool isAdjacentWith(CellItem* other);
 

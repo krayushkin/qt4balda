@@ -11,7 +11,7 @@
 #include <vector>
 #include <list>
 #include <QtGui>
-
+#include "scorepanelitem.h"
 #include "cell_item.h"
 
 struct MoveLog
@@ -100,6 +100,7 @@ private:
 	// Cells
 	QVector< QVector<CellItem *> > cells;
 
+        ScorePanelItem *score;
 	MoveLog log;
 
 };

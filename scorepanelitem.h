@@ -2,7 +2,7 @@
 #define SCOREPANELITEM_H
 
 #include <QGraphicsWidget>
-
+#include "cell_item.h"
 
 class ScorePanelItem : public QGraphicsWidget
 {
@@ -38,7 +38,7 @@ signals:
 
 public slots:
     void Clear();
-    void AddWord(QString word);
+    void AddWord(QList<CellItem*> word);
 };
 
 #endif // SCOREPANELITEM_H

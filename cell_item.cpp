@@ -20,6 +20,16 @@ void CellItem::setChar(QChar c) {
 
 //********************************
 
+QPixmap CellItem::snapshot()
+{
+    QPixmap pixmap(QSize(size().width(), size().height() ));
+    QPainter painter;
+    painter.begin(&pixmap);
+    paint(&painter, 0, 0);
+    painter.end();
+    return pixmap;
+}
+
 CellItem::CellItem(QGraphicsItem* parent_item, int row, int column) :
 	QGraphicsWidget(parent_item),
 			is_empty(true),

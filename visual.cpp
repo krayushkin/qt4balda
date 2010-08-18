@@ -5,7 +5,9 @@
  *      Author: dmitry
  */
 
+
 #include "visual.h"
+
 
 TextWidget::TextWidget(const QString& text, QGraphicsItem* parent) :
 	QGraphicsWidget(parent), text(text), color(Qt::black)
@@ -141,9 +143,10 @@ BoardItem::BoardItem(QGraphicsItem* parent_item) :
             layout->addItem(it, i, j);
         }
     }
-
+    score = new ScorePanelItem("", QImage(), this);
     layout->addItem(current_word, rows, 0, 1, columns);
     layout->addItem(help_test, rows+1, 0, 1, columns);
+    layout->addItem(score, rows+2, 0, 1, columns);
 
     setLayout(layout);
 
@@ -259,6 +262,12 @@ void BoardItem::closeMove()
     if (log.phase == MoveLog::MOVE_PHASE_CLOSE_WORD)
     {
         log.added_char->setMarkedFont(false);
+
+
+
+        score->AddWord(log.cells);
+
+
         log.cells.clear();
         foreach (QVector<CellItem*> row, cells)
         {
