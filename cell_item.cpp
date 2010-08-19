@@ -22,12 +22,14 @@ void CellItem::setChar(QChar c) {
 
 QPixmap CellItem::snapshot()
 {
-    QPixmap pixmap(QSize(size().width(), size().height() ));
+    QImage pixmap(size().width()+10, size().height()+10, QImage::Format_ARGB32_Premultiplied );
     QPainter painter;
     painter.begin(&pixmap);
+    qDebug() << pixmap.hasAlphaChannel();
+    painter.setRenderHint(QPainter::TextAntialiasing);
     paint(&painter, 0, 0);
     painter.end();
-    return pixmap;
+    return QPixmap::fromImage( pixmap );
 }
 
 CellItem::CellItem(QGraphicsItem* parent_item, int row, int column) :

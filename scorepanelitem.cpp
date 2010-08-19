@@ -6,6 +6,9 @@
 #include <QGraphicsTextItem>
 #include <QPropertyAnimation>
 
+
+
+
 ScorePanelItem::ScorePanelItem(QString player_name, QImage icon, QGraphicsWidget *parent) :
     QGraphicsWidget(parent)
 {
@@ -56,14 +59,14 @@ void ScorePanelItem::AddWord(QList<CellItem*> word)
     QParallelAnimationGroup *anim_group = new QParallelAnimationGroup(this);
     foreach(CellItem* item, word)
     {
-        QGraphicsPixmapItem* p_item = new QGraphicsPixmapItem(item->snapshot() ,this);
-        p_item->setPos(item->scenePos());
-        QPropertyAnimation *anim = new QPropertyAnimation;
-        anim->setPropertyName("pos");
-        anim->setTargetObject((QObject*)p_item);
+        Pixmap* p_item = new Pixmap(item->snapshot() ,this);
+        //p_item->setPos( mapFromItem(item, 0, 0) );
+        QPropertyAnimation *anim = new QPropertyAnimation(p_item, "pos");
         anim->setDuration(1000);
-        anim->setStartValue(item->scenePos());
+        anim->setStartValue( mapFromItem(item, 0, 0) );
         anim->setEndValue(QPointF(0, 0));
+        QEasingCurve c(QEasingCurve::InOutBack);
+        anim->setEasingCurve(c);
         anim_group->addAnimation(anim);
     }
     anim_group->start();

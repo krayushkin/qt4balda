@@ -4,6 +4,22 @@
 #include <QGraphicsWidget>
 #include "cell_item.h"
 
+class Pixmap : public QObject, public QGraphicsPixmapItem
+{
+    Q_OBJECT
+    Q_PROPERTY(QPointF pos READ pos WRITE setPos)
+public:
+    Pixmap(const QPixmap &pix, QGraphicsItem* parent)
+        : QObject(), QGraphicsPixmapItem(pix, parent)
+    {
+       // setCacheMode(DeviceCoordinateCache);
+    }
+    virtual ~Pixmap()
+    {
+
+    }
+};
+
 class ScorePanelItem : public QGraphicsWidget
 {
     Q_OBJECT
