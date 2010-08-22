@@ -12,7 +12,7 @@
 TextWidget::TextWidget(const QString& text, QGraphicsItem* parent) :
 	QGraphicsWidget(parent), text(text), color(Qt::black)
 {
-
+    setMinimumSize(200, 30);
 }
 
 void TextWidget::setText(const QString& s)
@@ -123,7 +123,7 @@ BoardItem::BoardItem(QGraphicsItem* parent_item) :
 	QGraphicsWidget(parent_item), opacity(1), image(tr("atra_dot.png")),
         rows(5), columns(5), cells(rows, QVector<CellItem*> (columns))
 {
-    setMinimumSize(100, 100);
+    setMinimumSize(200, 200);
 
     QGraphicsGridLayout *layout = new QGraphicsGridLayout;
 
@@ -143,7 +143,7 @@ BoardItem::BoardItem(QGraphicsItem* parent_item) :
             layout->addItem(it, i, j);
         }
     }
-    score = new ScorePanelItem("", QImage(), this);
+    score = new ScorePanelItem("", QImage(), ScorePanelItem::LEFT, this);
     layout->addItem(current_word, rows, 0, 1, columns);
     layout->addItem(help_test, rows+1, 0, 1, columns);
     layout->addItem(score, rows+2, 0, 1, columns);
@@ -263,12 +263,6 @@ void BoardItem::closeMove()
     {
         log.added_char->setMarkedFont(false);
 
-
-
-        score->AddWord(log.cells);
-
-
-        log.cells.clear();
         foreach (QVector<CellItem*> row, cells)
         {
             foreach (CellItem* item, row)
@@ -276,6 +270,8 @@ void BoardItem::closeMove()
                 item->setState(STATE_DEFAULT);
             }
         }
+        if (!log.cells.isEmpty()) score->AddWord(log.cells);
+        log.cells.clear();
         emit currentWordChanged(getCurrentWord());
         log.phase = MoveLog::MOVE_PHASE_NOT_STARTED;
         emit stateChanged();

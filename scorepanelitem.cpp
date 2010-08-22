@@ -9,14 +9,14 @@
 
 
 
-ScorePanelItem::ScorePanelItem(QString player_name, QImage icon, QGraphicsWidget *parent) :
-    QGraphicsWidget(parent)
+ScorePanelItem::ScorePanelItem(QString player_name, QImage icon, Align align, QGraphicsItem *parent):
+    QGraphicsWidget(parent), m_coord(align)
 {
-    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+    words_layout = new QGraphicsLinearLayout(Qt::Vertical );
+    words_layout->setSpacing(0);
+    setLayout(words_layout);
 
 
-
-    setLayout(layout);
 }
 
 void ScorePanelItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -24,8 +24,7 @@ void ScorePanelItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     QRectF frame(QPointF(0, 0), geometry().size());
     painter->setOpacity(0.7);
-
-
+    painter->drawRect(0,0, size().width(), size().height());
 }
 
 
@@ -54,17 +53,31 @@ void ScorePanelItem::Clear()
     update();
 }
 
+
+
 void ScorePanelItem::AddWord(QList<CellItem*> word)
 {
     QParallelAnimationGroup *anim_group = new QParallelAnimationGroup(this);
-    foreach(CellItem* item, word)
+    QList<QPixmap*> pixmaps;
+    foreach (CellItem* item, word)
     {
-        Pixmap* p_item = new Pixmap(item->snapshot() ,this);
-        //p_item->setPos( mapFromItem(item, 0, 0) );
+        Pixmap* p_item = new Pixmap(item->snapshot().scaledToHeight(30, Qt::SmoothTransformation), this);
+        pixmaps << p_item;
+    }
+
+
+    QMap<Pixmap*, QPointF> coord = m_coord.getNextWordCoord(word);
+
+
+    CellItem *item;
+    foreach(Pixmap* p_item, pixmaps)
+    {
+        item
+
         QPropertyAnimation *anim = new QPropertyAnimation(p_item, "pos");
-        anim->setDuration(1000);
+        anim->setDuration(800);
         anim->setStartValue( mapFromItem(item, 0, 0) );
-        anim->setEndValue(QPointF(0, 0));
+        anim->setEndValue( coord[item] );
         QEasingCurve c(QEasingCurve::InOutBack);
         anim->setEasingCurve(c);
         anim_group->addAnimation(anim);

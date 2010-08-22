@@ -22,14 +22,15 @@ void CellItem::setChar(QChar c) {
 
 QPixmap CellItem::snapshot()
 {
-    QImage pixmap(size().width()+10, size().height()+10, QImage::Format_ARGB32_Premultiplied );
+    QPixmap pixmap(size().width()+10, size().height()+10);
     QPainter painter;
+    pixmap.fill(QColor(0,0,0,0));
     painter.begin(&pixmap);
-    qDebug() << pixmap.hasAlphaChannel();
-    painter.setRenderHint(QPainter::TextAntialiasing);
+    painter.translate(5, 5);
+    painter.setRenderHint(QPainter::Antialiasing);
     paint(&painter, 0, 0);
     painter.end();
-    return QPixmap::fromImage( pixmap );
+    return pixmap;
 }
 
 CellItem::CellItem(QGraphicsItem* parent_item, int row, int column) :
@@ -88,10 +89,9 @@ QSizeF CellItem::sizeHint(Qt::SizeHint which,
 	switch (which) {
 	case Qt::MinimumSize:
 	case Qt::PreferredSize:
+                case Qt::MaximumSize:
 		// Do not allow a size smaller than the pixmap with two frames around it.
                 return QSizeF(30, 30);
-	case Qt::MaximumSize:
-		return QSizeF(1000, 1000);
 	default:
 		break;
 	}

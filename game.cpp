@@ -21,7 +21,7 @@ game::game(QWidget *parent) :
     ui.graphicsView->setScene(scene);
     ui.graphicsView->setRenderHint(QPainter::Antialiasing);
 
-    resize(500, 500);
+    resize(1000, 1000);
 }
 
 
